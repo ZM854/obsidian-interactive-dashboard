@@ -1,4 +1,4 @@
-import { Notice, Plugin } from 'obsidian';
+import { Plugin } from 'obsidian';
 import {
 	DEFAULT_SETTINGS,
 	InteractiveDashboardPluginSettings,
@@ -18,7 +18,7 @@ export default class InteractiveDashboardPlugin extends Plugin {
 
 		this.registerView(
 			VIEW_TYPE_DASHBOARD,
-			(leaf) => new DashboardView(leaf),
+			(leaf) => new DashboardView(leaf, this),
 		);
 
 		this.addCommand({
@@ -30,10 +30,6 @@ export default class InteractiveDashboardPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new InteractiveDashboardSettingTab(this.app, this));
-
-		this.registerDomEvent(activeDocument, 'click', (_evt: MouseEvent) => {
-			new Notice('Click');
-		});
 	}
 
 	onunload() {}

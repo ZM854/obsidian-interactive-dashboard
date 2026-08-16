@@ -1,12 +1,12 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab } from 'obsidian';
 import InteractiveDashboardPlugin from './main';
 
 export interface InteractiveDashboardPluginSettings {
-	mySetting: string;
+	dailyNotesFolder: string;
 }
 
 export const DEFAULT_SETTINGS: InteractiveDashboardPluginSettings = {
-	mySetting: 'default',
+	dailyNotesFolder: 'Daily Notes/Daily',
 };
 
 export class InteractiveDashboardSettingTab extends PluginSettingTab {
@@ -17,22 +17,17 @@ export class InteractiveDashboardSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	display(): void {
-		const { containerEl } = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Settings #1')
-			.setDesc("It's a secret")
-			.addText((text) =>
-				text
-					.setPlaceholder('Enter your secret')
-					.setValue(this.plugin.settings.mySetting)
-					.onChange(async (value) => {
-						this.plugin.settings.mySetting = value;
-						await this.plugin.saveSettings();
-					}),
-			);
+	getSettingDefinitions() {
+		return [
+			{
+				name: 'Daily notes folder',
+				desc: 'Folder containing your daily notes.',
+				control: {
+					type: 'folder',
+					key: 'dailyNotesFolder',
+					placeholder: 'Daily',
+				},
+			},
+		];
 	}
 }
