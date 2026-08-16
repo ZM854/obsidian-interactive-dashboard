@@ -1,6 +1,6 @@
 import { App, TFile } from 'obsidian';
 import InteractiveDashboardPlugin from '../main';
-import { DashboardTask } from '../types/dashboard';
+import { DailyTasks, DashboardTask } from '../types/dashboard';
 
 export class DailyNoteService {
 	constructor(
@@ -55,6 +55,82 @@ export class DailyNoteService {
 					line: line,
 				};
 			});
+	}
+
+	async getTasksForDays(dates: Date[]): Promise<DailyTasks[]> {
+		return Promise.all(
+			dates.map(async (date) => ({
+				date,
+				filePath: this.getDailyNotePath(date),
+				tasks: await this.getTasks(date),
+			})),
+		);
+	}
+
+	async setTaskCompleted(
+		task: DashboardTask,
+		completed: boolean,
+	): Promise<void> {
+		const file = this.app.vault.getAbstractFileByPath(task.filePath);
+
+		if (!(file instanceof TFile)) {
+			throw new Error(`Daily note not found: ${task.filePath}`);
+		}
+
+		await this.app.vault.process(file, (content) => {
+			const lines = content.split('\n');
+			const currentLine = lines[task.line];
+
+			if (currentLine === undefined) {
+				throw new Error(`Task line was not found: ${task.line}`);
+			}
+
+			const currentStatus = this.getTaskStatus(currentLine);
+
+			if (currentStatus === null) {
+				throw new Error(
+					`Task not found at ${task.filePath}:${task.line}`,
+				);
+			}
+
+			if (!this.isSameTask(currentLine, task)) {
+				throw new Error(
+					`Task has changed or moved: ${task.filePath}:${task.line}`,
+				);
+			}
+
+			lines[task.line] = this.replaceTaskStatus(currentLine, completed);
+			return lines.join('\n');
+		});
+	}
+
+	async openDailyNote(date: Date): Promise<boolean> {
+		const file = this.getDailyNote(date);
+
+		if (!file) {
+			return false;
+		}
+
+		await this.app.workspace.getLeaf().openFile(file);
+
+		return true;
+	}
+
+	private isSameTask(line: string, task: DashboardTask): boolean {
+		return this.extractTaskText(line) === task.text;
+	}
+
+	private getTaskStatus(line: string): string | null {
+		const match = line.match(/^\s*[-*+]\s+\[([^\]])\]/);
+
+		return match?.[1] ?? null;
+	}
+
+	private replaceTaskStatus(line: string, completed: boolean): string {
+		return line.replace(
+			/^(\s*[-*+]\s+\[)[^\]](\])/,
+			`$1${completed ? 'x' : ' '}$2`,
+		);
 	}
 
 	private extractTaskText(line: string): string {

@@ -31,11 +31,6 @@ export default class InteractiveDashboardPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new InteractiveDashboardSettingTab(this.app, this));
-
-		const service = new DailyNoteService(this.app, this);
-
-		const tasks = await service.getTasks(new Date(2026, 7, 16));
-		console.log('Tasks:', tasks);
 	}
 
 	onunload() {}

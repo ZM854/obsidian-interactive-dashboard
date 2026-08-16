@@ -15,7 +15,7 @@ export interface DashboardTask {
 }
 
 export interface DailyTasks {
-	date: string;
+	date: Date;
 	filePath: string;
 	tasks: DashboardTask[];
 }
