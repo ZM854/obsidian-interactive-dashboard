@@ -23,6 +23,14 @@ export class DailyNoteService {
 		return file instanceof TFile ? file : null;
 	}
 
+	isDailyNote(file: TFile): boolean {
+		const folder = this.plugin.settings.dailyNotesFolder
+			.trim()
+			.replace(/^\/+|\/+$/g, '');
+
+		return file.path.startsWith(`${folder}/`);
+	}
+
 	async getTasks(date: Date): Promise<DashboardTask[]> {
 		const file = this.getDailyNote(date);
 

@@ -28,7 +28,10 @@ export class DashboardView extends ItemView {
 		this.root = createRoot(this.contentEl);
 		this.root.render(
 			<StrictMode>
-				<Dashboard />
+				<Dashboard
+					dailyNotesService={this.plugin.dailyNotesService}
+					vault={this.app.vault}
+				/>
 			</StrictMode>,
 		);
 	}

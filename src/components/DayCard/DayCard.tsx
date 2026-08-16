@@ -1,23 +1,45 @@
+import { DashboardTask } from '../../types/dashboard';
+
 interface DayCardProps {
-	date: string;
-	tasks: string[];
+	date: Date;
+	tasks: DashboardTask[];
+	onTaskChange: (taskId: string, completed: boolean) => void;
+	onDayClick: (date: Date) => void;
 }
 
-const DayCard = ({ date, tasks }: DayCardProps) => {
+const DayCard = ({ date, tasks, onTaskChange, onDayClick }: DayCardProps) => {
 	return (
 		<div className="day-card">
 			<div className="day-card__header">
-				<h2>{date}</h2>
+				<button type="button" onClick={() => onDayClick(date)}>
+					{date.toLocaleDateString('en-US', {
+						day: 'numeric',
+						month: 'long',
+					})}
+				</button>
 			</div>
 
 			<div className="day-card__tasks">
-				{tasks.map((task) => (
-					<div className="day-card__task" key={task}>
-						<input type="checkbox" disabled />
+				{tasks.length === 0 ? (
+					<p>No tasks</p>
+				) : (
+					tasks.map((task) => (
+						<label className="day-card__task" key={task.id}>
+							<input
+								type="checkbox"
+								checked={task.completed}
+								onChange={(event) => {
+									void onTaskChange(
+										task.id,
+										event.target.checked,
+									);
+								}}
+							/>
 
-						<span>{task}</span>
-					</div>
-				))}
+							<span>{task.text}</span>
+						</label>
+					))
+				)}
 			</div>
 		</div>
 	);

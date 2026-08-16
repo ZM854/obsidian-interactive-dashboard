@@ -10,8 +10,12 @@ import { DailyNoteService } from './services/DailyNotesService';
 export default class InteractiveDashboardPlugin extends Plugin {
 	settings!: InteractiveDashboardPluginSettings;
 
+	dailyNotesService!: DailyNoteService;
+
 	async onload() {
 		await this.loadSettings();
+
+		this.dailyNotesService = new DailyNoteService(this.app, this);
 
 		this.addRibbonIcon('file-chart-pie', 'Dashboard', () => {
 			void this.activateDashboardView();
