@@ -1,0 +1,76 @@
+.card {
+	box-sizing: border-box;
+	display: flex;
+	flex: 0 0 clamp(17rem, 28vw, 21rem);
+	flex-direction: column;
+	gap: var(--size-4-3, 12px);
+	min-height: 11rem;
+	padding: var(--size-4-4, 16px);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m, 8px);
+	background: var(--background-secondary);
+	scroll-snap-align: start;
+}
+
+.header {
+	min-width: 0;
+	display: block;
+	width: 100%;
+	border-radius: var(--radius-s, 4px);
+	color: var(--text-normal);
+	cursor: pointer;
+	font-size: var(--font-ui-large, 1.25rem);
+	font-weight: 600;
+	line-height: var(--line-height-normal);
+}
+
+.header:hover {
+	color: var(--interactive-accent);
+}
+
+.header:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 3px;
+}
+
+.tasks {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-1, 4px);
+	min-width: 0;
+}
+
+.empty {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+}
+
+.task {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	gap: var(--size-4-2, 8px);
+	align-items: start;
+	padding: var(--size-2-1, 3px) var(--size-4-1, 4px);
+	border-radius: var(--radius-s, 4px);
+	color: var(--text-normal);
+	line-height: var(--line-height-normal);
+}
+
+.task:hover {
+	background: var(--background-modifier-hover);
+}
+
+.checkbox {
+	margin: 0.25em 0 0;
+	accent-color: var(--interactive-accent);
+}
+
+.taskText {
+	overflow-wrap: anywhere;
+}
+
+.completed .taskText {
+	color: var(--text-muted);
+	text-decoration: line-through;
+}

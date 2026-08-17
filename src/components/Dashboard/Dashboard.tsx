@@ -1,6 +1,11 @@
 import { TFile, Vault } from 'obsidian';
 import { DailyNoteService } from '../../services/DailyNotesService';
 import DayCard from '../DayCard/DayCard';
+import {
+	dashboard,
+	days as daysClassName,
+	sectionTitle,
+} from './Dashboard.module.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DailyTasks } from '../../types/dashboard';
 
@@ -124,8 +129,11 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 	}
 
 	return (
-		<div className="dashboard">
-			<div className="dashboard__days">
+		<section className={dashboard} aria-labelledby="dashboard-tasks-title">
+			<h2 className={sectionTitle} id="dashboard-tasks-title">
+				Tasks for the next 7 days
+			</h2>{' '}
+			<div className={daysClassName}>
 				{days.map((day) => (
 					<DayCard
 						key={day.date.toISOString()}
@@ -140,7 +148,7 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 					/>
 				))}
 			</div>
-		</div>
+		</section>
 	);
 };
 
