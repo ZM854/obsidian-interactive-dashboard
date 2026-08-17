@@ -1,7 +1,7 @@
 import { TFile, Vault } from 'obsidian';
 import { DailyNoteService } from '../../services/DailyNotesService';
 import DayCard from '../DayCard/DayCard';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DailyTasks } from '../../types/dashboard';
 
 interface DashboardProps {
@@ -27,21 +27,30 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 	const [days, setDays] = useState<DailyTasks[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const loadVersion = useRef(0);
 
 	const loadTasks = useCallback(async () => {
+		const version = ++loadVersion.current;
+
 		try {
 			setError(null);
 
 			const dates = getNextDays(DAYS_TO_SHOW);
 			const result = await dailyNotesService.getTasksForDays(dates);
 
-			setDays(result);
+			if (version === loadVersion.current) {
+				setDays(result);
+			}
 		} catch (error) {
 			console.error('Failed to load dashboard tasks:', error);
 
-			setError('Не удалось загрузить задачи');
+			if (version === loadVersion.current) {
+				setError('Не удалось загрузить задачи');
+			}
 		} finally {
-			setLoading(false);
+			if (version === loadVersion.current) {
+				setLoading(false);
+			}
 		}
 	}, [dailyNotesService]);
 
@@ -77,7 +86,24 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 		}
 
 		try {
+			loadVersion.current += 1;
+			setDays((currentDays) =>
+				currentDays.map((day) => ({
+					...day,
+					tasks: day.tasks.map((currentTask) =>
+						currentTask.id === taskId
+							? {
+									...currentTask,
+									completed,
+									status: completed ? 'x' : ' ',
+								}
+							: currentTask,
+					),
+				})),
+			);
+
 			await dailyNotesService.setTaskCompleted(task, completed);
+			await loadTasks();
 		} catch (error) {
 			console.error('failed to update task:', error);
 
@@ -86,11 +112,7 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 	};
 
 	const handleDayClick = async (date: Date) => {
-		const opened = await dailyNotesService.openDailyNote(date);
-
-		if (!opened) {
-			console.log('Daily note does not exist');
-		}
+		await dailyNotesService.openDailyNote(date);
 	};
 
 	if (loading) {
@@ -109,8 +131,12 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 						key={day.date.toISOString()}
 						date={day.date}
 						tasks={day.tasks}
-						onTaskChange={handleTaskChange}
-						onDayClick={handleDayClick}
+						onTaskChange={(taskId, completed) => {
+							void handleTaskChange(taskId, completed);
+						}}
+						onDayClick={(date) => {
+							void handleDayClick(date);
+						}}
 					/>
 				))}
 			</div>

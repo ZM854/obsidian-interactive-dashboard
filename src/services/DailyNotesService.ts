@@ -38,31 +38,26 @@ export class DailyNoteService {
 			return [];
 		}
 
-		const cache = this.app.metadataCache.getFileCache(file);
-
-		if (!cache?.listItems) {
-			return [];
-		}
-
 		const content = await this.app.vault.read(file);
 		const lines = content.split('\n');
 
-		return cache.listItems
-			.filter((item) => item.task !== undefined)
-			.map((item) => {
-				const line = item.position.start.line;
-				const rawLine = lines[line] ?? '';
-				const status = item.task ?? ' ';
+		return lines.flatMap((rawLine, line) => {
+			const status = this.getTaskStatus(rawLine);
+			const text = this.extractTaskText(rawLine);
 
-				return {
-					id: `${file.path}:${line}`,
-					text: this.extractTaskText(rawLine),
-					completed: status !== ' ',
-					status,
-					filePath: file.path,
-					line: line,
-				};
-			});
+			if (status === null || text.length === 0) {
+				return [];
+			}
+
+			return [{
+				id: `${file.path}:${line}`,
+				text,
+				completed: status !== ' ',
+				status,
+				filePath: file.path,
+				line,
+			}];
+		});
 	}
 
 	async getTasksForDays(dates: Date[]): Promise<DailyTasks[]> {
