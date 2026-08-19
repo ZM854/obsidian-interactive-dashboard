@@ -3,10 +3,12 @@ import InteractiveDashboardPlugin from './main';
 
 export interface InteractiveDashboardPluginSettings {
 	dailyNotesFolder: string;
+	daysToDisplay: number;
 }
 
 export const DEFAULT_SETTINGS: InteractiveDashboardPluginSettings = {
 	dailyNotesFolder: 'Daily Notes/Daily',
+	daysToDisplay: 7,
 };
 
 export class InteractiveDashboardSettingTab extends PluginSettingTab {
@@ -26,6 +28,16 @@ export class InteractiveDashboardSettingTab extends PluginSettingTab {
 					type: 'folder',
 					key: 'dailyNotesFolder',
 					placeholder: 'Daily',
+				},
+			},
+			{
+				name: 'Days to display',
+				desc: 'Number of days displayed on the dashboard.',
+				control: {
+					type: 'number',
+					key: 'daysToDisplay',
+					placeholder: '7',
+					min: 1,
 				},
 			},
 		];

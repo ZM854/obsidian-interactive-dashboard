@@ -29,6 +29,7 @@ export class DashboardView extends ItemView {
 		this.root.render(
 			<StrictMode>
 				<Dashboard
+					daysToDisplay={this.plugin.settings.daysToDisplay}
 					dailyNotesService={this.plugin.dailyNotesService}
 					vault={this.app.vault}
 				/>

@@ -3,7 +3,6 @@ import {
 	card,
 	checkbox,
 	completed,
-	date as dateClassName,
 	empty,
 	header,
 	task as taskClassName,

@@ -12,9 +12,8 @@ import { DailyTasks } from '../../types/dashboard';
 interface DashboardProps {
 	dailyNotesService: DailyNoteService;
 	vault: Vault;
+	daysToDisplay: number;
 }
-
-const DAYS_TO_SHOW = 7;
 
 const getNextDays = (count: number): Date[] => {
 	const today = new Date();
@@ -28,7 +27,11 @@ const getNextDays = (count: number): Date[] => {
 	});
 };
 
-const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
+const Dashboard = ({
+	dailyNotesService,
+	vault,
+	daysToDisplay,
+}: DashboardProps) => {
 	const [days, setDays] = useState<DailyTasks[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -40,7 +43,7 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 		try {
 			setError(null);
 
-			const dates = getNextDays(DAYS_TO_SHOW);
+			const dates = getNextDays(daysToDisplay);
 			const result = await dailyNotesService.getTasksForDays(dates);
 
 			if (version === loadVersion.current) {
@@ -50,7 +53,7 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 			console.error('Failed to load dashboard tasks:', error);
 
 			if (version === loadVersion.current) {
-				setError('Не удалось загрузить задачи');
+				setError('Failed to load tasks');
 			}
 		} finally {
 			if (version === loadVersion.current) {
@@ -131,8 +134,8 @@ const Dashboard = ({ dailyNotesService, vault }: DashboardProps) => {
 	return (
 		<section className={dashboard} aria-labelledby="dashboard-tasks-title">
 			<h2 className={sectionTitle} id="dashboard-tasks-title">
-				Tasks for the next 7 days
-			</h2>{' '}
+				{`Tasks for the next ${daysToDisplay} ${daysToDisplay === 1 ? 'day' : 'days'}`}
+			</h2>
 			<div className={daysClassName}>
 				{days.map((day) => (
 					<DayCard
